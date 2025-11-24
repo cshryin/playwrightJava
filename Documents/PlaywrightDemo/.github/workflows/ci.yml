@@ -8,10 +8,11 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
     strategy:
       matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
         java-version: [21, 25]
+    runs-on: ${{ matrix.os }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -35,12 +36,24 @@ jobs:
         with:
           node-version: '18'
 
-      - name: Cache Playwright browsers
+      - name: Cache Playwright browsers (Linux/macOS)
+        if: matrix.os != 'windows-latest'
         uses: actions/cache@v4
         with:
           path: |
             ~/.cache/ms-playwright
             ~/.cache/playwright
+          key: ${{ runner.os }}-playwright-${{ matrix.java-version }}-${{ hashFiles('**/pom.xml') }}
+          restore-keys: |
+            ${{ runner.os }}-playwright-
+
+      - name: Cache Playwright browsers (Windows)
+        if: matrix.os == 'windows-latest'
+        uses: actions/cache@v4
+        with:
+          path: |
+            C:\Users\runneradmin\AppData\Local\ms-playwright
+            C:\Users\runneradmin\AppData\Local\playwright
           key: ${{ runner.os }}-playwright-${{ matrix.java-version }}-${{ hashFiles('**/pom.xml') }}
           restore-keys: |
             ${{ runner.os }}-playwright-

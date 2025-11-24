@@ -35,8 +35,10 @@ jobs:
         with:
           node-version: '18'
 
-      - name: Install Playwright browsers
-        run: npx playwright install --with-deps
+      - name: Install Playwright browsers (official Action)
+        uses: microsoft/playwright-github-action@v1
+        with:
+          browsers: 'chromium,firefox,webkit'
 
       - name: Build and run tests (headless)
         run: mvn -Dheadless=true -U test
